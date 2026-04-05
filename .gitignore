@@ -1,0 +1,23 @@
+node_modules/
+bun.lock
+coverage/
+dist/
+build/
+*.tgz
+.env
+.env.local
+.env.*.local
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+logs/
+*.log
+tmp/
+temp/
+
+# 插件构建产物（由 bun run package 生成）
+plugins/

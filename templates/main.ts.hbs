@@ -1,0 +1,29 @@
+import { parseArgs } from "node:util";
+
+const { values, positionals } = parseArgs({
+  args: Bun.argv.slice(2),
+  options: {
+    help: { type: "boolean", short: "h" },
+  },
+  allowPositionals: true,
+});
+
+if (values.help) {
+  console.log(`
+{{displayName}}
+
+用法: /{{name}} <参数>
+
+选项:
+  -h, --help    显示帮助信息
+`);
+  process.exit(0);
+}
+
+if (positionals.length === 0) {
+  console.error("错误: 请提供参数");
+  process.exit(2);
+}
+
+// TODO: 实现 skill 逻辑
+console.log(`{{displayName}} 执行中...`, positionals);

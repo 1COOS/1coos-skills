@@ -1,0 +1,29 @@
+import { describe, expect, it } from "bun:test";
+import { join } from "node:path";
+
+const MAIN_PATH = join(import.meta.dir, "main.ts");
+
+async function run(args: string[] = []) {
+  const proc = Bun.spawn(["bun", "run", MAIN_PATH, ...args], {
+    stdout: "pipe",
+    stderr: "pipe",
+  });
+  const exitCode = await proc.exited;
+  const stdout = await new Response(proc.stdout).text();
+  const stderr = await new Response(proc.stderr).text();
+  return { exitCode, stdout, stderr };
+}
+
+describe("{{name}}", () => {
+  it("--help 应显示帮助信息", async () => {
+    const { exitCode, stdout } = await run(["--help"]);
+    expect(exitCode).toBe(0);
+    expect(stdout).toContain("{{displayName}}");
+  });
+
+  it("无参数应报错", async () => {
+    const { exitCode, stderr } = await run([]);
+    expect(exitCode).toBe(2);
+    expect(stderr).toContain("请提供参数");
+  });
+});
