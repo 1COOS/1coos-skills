@@ -1,7 +1,7 @@
 ---
 name: 1coos-markdown-converter
-description: Convert files (PDF, DOCX, PPTX, XLSX, HTML, CSV, JSON, XML, images, audio, EPub) to beautifully formatted Markdown. Uses uvx markitdown[all] for conversion with github/commonmark/clean/obsidian style formatting. TRIGGER when user asks to convert a file to Markdown, extract text from PDF/DOCX/PPTX/XLSX, or format a document as Markdown.
-version: 1.0.0
+description: Convert files to beautifully formatted Markdown. TRIGGER when user asks to convert a file to Markdown, extract text from PDF/DOCX/PPTX/XLSX, or format a document as Markdown.
+version: 1.0.1
 metadata: {"openclaw":{"requires":{"bins":["bun","uvx"]},"install":[{"kind":"uv","package":"markitdown[all]","bins":["markitdown"]}],"emoji":"📝"}}
 ---
 
