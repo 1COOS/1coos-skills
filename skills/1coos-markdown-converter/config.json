@@ -1,0 +1,16 @@
+{
+  "style": "obsidian",
+  "outputDir": null,
+  "convertOnly": false,
+  "formatting": {
+    "maxWidth": 80,
+    "listMarker": "-",
+    "emphasisMarker": "*",
+    "strongMarker": "**",
+    "codeBlockStyle": "fenced"
+  },
+  "converter": {
+    "timeout": 60000,
+    "charset": "UTF-8"
+  }
+}
