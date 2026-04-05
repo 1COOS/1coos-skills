@@ -127,3 +127,127 @@ name: my-skill
     expect(result.warnings.some((w) => w.includes("body"))).toBe(true);
   });
 });
+
+describe("validateSkillMd — 多平台", () => {
+  it("openclaw 模式下不校验 Claude Code 专有字段", () => {
+    const content = `---
+name: my-skill
+description: test
+effort: ultra
+context: isolate
+---
+
+body`;
+
+    const result = validateSkillMd(content, "openclaw");
+    expect(result.valid).toBe(true);
+    expect(result.errors).toHaveLength(0);
+  });
+
+  it("claude-code 模式下校验 effort 和 context", () => {
+    const content = `---
+name: my-skill
+description: test
+effort: ultra
+---
+
+body`;
+
+    const result = validateSkillMd(content, "claude-code");
+    expect(result.valid).toBe(false);
+    expect(result.errors.some((e) => e.includes("effort"))).toBe(true);
+  });
+
+  it("codex 模式下不校验 Claude Code 专有字段", () => {
+    const content = `---
+name: my-skill
+description: test
+effort: ultra
+context: isolate
+---
+
+body`;
+
+    const result = validateSkillMd(content, "codex");
+    expect(result.valid).toBe(true);
+  });
+
+  it("all 模式下校验所有平台字段", () => {
+    const content = `---
+name: my-skill
+description: test
+effort: ultra
+---
+
+body`;
+
+    const result = validateSkillMd(content, "all");
+    expect(result.valid).toBe(false);
+    expect(result.errors.some((e) => e.includes("effort"))).toBe(true);
+  });
+});
+
+describe("validateSkillMd — OpenClaw metadata", () => {
+  it("有效的 metadata.openclaw 应通过", () => {
+    const content = `---
+name: my-skill
+description: test
+metadata:
+  openclaw:
+    os:
+      - darwin
+      - linux
+    requires:
+      bins:
+        - bun
+        - uvx
+---
+
+body`;
+
+    const result = validateSkillMd(content, "openclaw");
+    expect(result.valid).toBe(true);
+    expect(result.errors).toHaveLength(0);
+  });
+
+  it("无效的 os 值应给警告", () => {
+    const content = `---
+name: my-skill
+description: test
+metadata:
+  openclaw:
+    os:
+      - windows
+---
+
+body`;
+
+    const result = validateSkillMd(content, "openclaw");
+    expect(result.warnings.some((w) => w.includes("未知 OS 值"))).toBe(true);
+  });
+
+  it("混合 Claude Code 和 OpenClaw 字段应通过 all 模式", () => {
+    const content = `---
+name: my-skill
+description: test
+version: 1.0.0
+allowed-tools:
+  - Read
+  - Bash
+effort: medium
+metadata:
+  openclaw:
+    os:
+      - darwin
+    requires:
+      bins:
+        - bun
+---
+
+body`;
+
+    const result = validateSkillMd(content, "all");
+    expect(result.valid).toBe(true);
+    expect(result.errors).toHaveLength(0);
+  });
+});

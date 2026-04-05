@@ -1,3 +1,5 @@
+import { parse as parseYaml } from "yaml";
+
 /**
  * 异步延迟
  */
@@ -65,7 +67,7 @@ export function isKebabCase(str: string): boolean {
 }
 
 /**
- * 读取文件的 YAML frontmatter
+ * 读取文件的 YAML frontmatter（支持完整 YAML 语法，包括嵌套结构）
  */
 export function parseFrontmatter(
   content: string,
@@ -74,32 +76,14 @@ export function parseFrontmatter(
   if (!match) return null;
 
   const [, yamlStr, body] = match;
-  const frontmatter: Record<string, unknown> = {};
 
-  for (const line of yamlStr.split("\n")) {
-    const colonIndex = line.indexOf(":");
-    if (colonIndex === -1) continue;
-    const key = line.slice(0, colonIndex).trim();
-    let value: unknown = line.slice(colonIndex + 1).trim();
-
-    // 处理简单的 YAML 值类型
-    if (value === "true") value = true;
-    else if (value === "false") value = false;
-    else if (/^\d+$/.test(value as string)) value = parseInt(value as string);
-    // 处理 YAML 列表（单行格式 [a, b, c]）
-    else if (
-      typeof value === "string" &&
-      value.startsWith("[") &&
-      value.endsWith("]")
-    ) {
-      value = value
-        .slice(1, -1)
-        .split(",")
-        .map((s) => s.trim());
+  try {
+    const parsed = parseYaml(yamlStr);
+    if (parsed == null || typeof parsed !== "object") {
+      return { frontmatter: {}, body: body.trim() };
     }
-
-    frontmatter[key] = value;
+    return { frontmatter: parsed as Record<string, unknown>, body: body.trim() };
+  } catch {
+    return null;
   }
-
-  return { frontmatter, body: body.trim() };
 }

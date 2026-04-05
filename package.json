@@ -16,6 +16,9 @@
     "package:all": "bun run scripts/package-plugin.ts --all",
     "publish": "bun run scripts/publish.ts"
   },
+  "dependencies": {
+    "@1coos/shared-utils": "workspace:*"
+  },
   "devDependencies": {
     "@types/bun": "latest",
     "typescript": "^5.4.0"
