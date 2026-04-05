@@ -5,6 +5,7 @@
 
 import { parseArgs } from "node:util";
 import { resolve, dirname, basename, extname, join } from "node:path";
+import { mkdirSync } from "node:fs";
 import { convertToMarkdown, type ConverterConfig, DEFAULT_CONVERTER_CONFIG } from "./converter";
 import { formatMarkdown, type FormatStyle, type FormattingConfig, DEFAULT_FORMATTING_CONFIG } from "./formatter";
 
@@ -12,7 +13,7 @@ import { formatMarkdown, type FormatStyle, type FormattingConfig, DEFAULT_FORMAT
 
 interface Config {
   style: FormatStyle;
-  output: string | null;
+  outputDir: string;
   convertOnly: boolean;
   formatting: FormattingConfig;
   converter: ConverterConfig;
@@ -20,7 +21,7 @@ interface Config {
 
 const DEFAULT_CONFIG: Config = {
   style: "obsidian",
-  output: null,
+  outputDir: join(resolve(dirname(import.meta.dir)), "output"),
   convertOnly: false,
   formatting: DEFAULT_FORMATTING_CONFIG,
   converter: DEFAULT_CONVERTER_CONFIG,
@@ -51,7 +52,7 @@ function mergeConfig(
 ): Config {
   return {
     style: cliOverrides.style ?? fileConfig.style ?? DEFAULT_CONFIG.style,
-    output: cliOverrides.output ?? fileConfig.output ?? DEFAULT_CONFIG.output,
+    outputDir: cliOverrides.outputDir ?? fileConfig.outputDir ?? DEFAULT_CONFIG.outputDir,
     convertOnly:
       cliOverrides.convertOnly ??
       fileConfig.convertOnly ??
@@ -84,7 +85,7 @@ Arguments:
 
 Options:
   -s, --style <style>      Formatting style: obsidian (default), github, commonmark, clean
-  -o, --output <path>      Output file path (default: same name with .md extension)
+  -o, --output-dir <path>   Output directory (default: skills/1coos-markdown-converter/output)
   -c, --config <path>      Config file path (default: ../config.json)
   --convert-only           Convert only, skip formatting step
   -h, --help               Show help
@@ -95,7 +96,7 @@ Supported formats:
 
 Examples:
   bun run main.ts report.pdf
-  bun run main.ts doc.docx --style clean --output result.md
+  bun run main.ts doc.docx --style clean --output-dir ~/notes
   bun run main.ts data.xlsx --convert-only
 `;
 
@@ -109,7 +110,7 @@ async function main() {
     options: {
       help: { type: "boolean", short: "h" },
       style: { type: "string", short: "s" },
-      output: { type: "string", short: "o" },
+      "output-dir": { type: "string", short: "o" },
       config: { type: "string", short: "c" },
       "convert-only": { type: "boolean" },
     },
@@ -153,8 +154,8 @@ async function main() {
     }
     cliOverrides.style = values.style as FormatStyle;
   }
-  if (values.output) {
-    cliOverrides.output = values.output;
+  if (values["output-dir"]) {
+    cliOverrides.outputDir = values["output-dir"];
   }
   if (values["convert-only"]) {
     cliOverrides.convertOnly = true;
@@ -162,13 +163,10 @@ async function main() {
 
   const config = mergeConfig(fileConfig, cliOverrides);
 
-  // Determine output path
-  const outputPath = config.output
-    ? resolve(config.output)
-    : resolve(
-        dirname(inputPath),
-        basename(inputPath, extname(inputPath)) + ".md",
-      );
+  // Determine output path: outputDir + input filename with .md extension
+  const outputDir = resolve(config.outputDir);
+  const outputFileName = basename(inputPath, extname(inputPath)) + ".md";
+  const outputPath = join(outputDir, outputFileName);
 
   // Step 1: Convert
   console.log(`Converting: ${inputPath}`);
@@ -190,6 +188,7 @@ async function main() {
   }
 
   // Step 3: Write output
+  mkdirSync(outputDir, { recursive: true });
   await Bun.write(outputPath, markdown);
   console.log(`Output: ${outputPath}`);
 }

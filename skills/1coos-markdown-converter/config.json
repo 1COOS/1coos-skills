@@ -1,6 +1,6 @@
 {
   "style": "obsidian",
-  "output": "../output",
+  "outputDir": null,
   "convertOnly": false,
   "formatting": {
     "maxWidth": 80,

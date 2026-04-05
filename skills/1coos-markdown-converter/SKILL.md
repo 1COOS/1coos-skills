@@ -2,7 +2,7 @@
 name: 1coos-markdown-converter
 description: Convert files (PDF, DOCX, PPTX, XLSX, HTML, CSV, JSON, XML, images, audio, EPub) to beautifully formatted Markdown. Uses uvx markitdown[all] for conversion with github/commonmark/clean/obsidian style formatting. Configurable via config.json.
 version: 1.0.0
-argument-hint: <file-path> [--style github|commonmark|clean|obsidian] [--output path] [--convert-only]
+argument-hint: <file-path> [--style github|commonmark|clean|obsidian] [--output-dir path] [--convert-only]
 allowed-tools: [Bash, Read, Write, Glob]
 user-invocable: true
 ---
@@ -14,7 +14,7 @@ Convert files to beautifully formatted Markdown in two steps: **convert** with `
 ## Usage
 
 ```
-/1coos-markdown-converter <file-path> [--style github|commonmark|clean|obsidian] [--output path] [--convert-only]
+/1coos-markdown-converter <file-path> [--style github|commonmark|clean|obsidian] [--output-dir path] [--convert-only]
 ```
 
 ## Parameters
@@ -23,7 +23,7 @@ Convert files to beautifully formatted Markdown in two steps: **convert** with `
 |-----------|----------|-------------|
 | `<file-path>` | Yes | Path to the file to convert |
 | `--style` | No | Formatting style: `github` (default), `commonmark`, `clean`, `obsidian` |
-| `--output` | No | Output file path (default: same name with `.md` extension) |
+| `--output-dir` | No | Output directory (default: `skills/1coos-markdown-converter/output`) |
 | `--convert-only` | No | Only convert, skip formatting step |
 | `--config` | No | Path to config.json (default: skill directory config.json) |
 
@@ -55,7 +55,7 @@ Core parameters are configurable via `config.json` in the skill directory:
 ```json
 {
   "style": "github",
-  "output": null,
+  "outputDir": null,
   "convertOnly": false,
   "formatting": {
     "maxWidth": 80,
@@ -100,8 +100,8 @@ When the user invokes this skill:
 # Convert Excel to markdown without formatting
 /1coos-markdown-converter data.xlsx --convert-only
 
-# Specify output path
-/1coos-markdown-converter slides.pptx --output ~/notes/slides.md
+# Specify output directory
+/1coos-markdown-converter slides.pptx --output-dir ~/notes
 ```
 
 ## Notes
