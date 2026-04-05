@@ -1,7 +1,10 @@
 import { existsSync } from "node:fs";
 import { readdir } from "node:fs/promises";
 import { join } from "node:path";
-import { validateSkillDir } from "@1coos/shared-utils/validator";
+import {
+  validateSkillDir,
+  type TargetPlatform,
+} from "@1coos/shared-utils/validator";
 
 const PROJECT_ROOT = join(import.meta.dir, "..");
 const SKILLS_DIR = join(PROJECT_ROOT, "skills");
@@ -30,12 +33,40 @@ async function runTests(skillDir: string): Promise<boolean> {
   return exitCode === 0;
 }
 
+const VALID_TARGETS: TargetPlatform[] = [
+  "claude-code",
+  "openclaw",
+  "codex",
+  "all",
+];
+
 async function main() {
   const args = Bun.argv.slice(2);
+
+  // 解析 --target 参数
+  let target: TargetPlatform = "all";
+  const filteredArgs: string[] = [];
+  for (let i = 0; i < args.length; i++) {
+    if (args[i] === "--target" && i + 1 < args.length) {
+      const val = args[i + 1] as TargetPlatform;
+      if (VALID_TARGETS.includes(val)) {
+        target = val;
+      } else {
+        console.error(
+          `无效的 target: ${args[i + 1]}（支持: ${VALID_TARGETS.join(", ")}）`,
+        );
+        process.exit(1);
+      }
+      i++; // 跳过值
+    } else {
+      filteredArgs.push(args[i]);
+    }
+  }
+
   let skillNames: string[];
 
-  if (args.length > 0) {
-    skillNames = args;
+  if (filteredArgs.length > 0) {
+    skillNames = filteredArgs;
   } else {
     if (!existsSync(SKILLS_DIR)) {
       console.log("没有找到 skills/ 目录");
@@ -50,7 +81,10 @@ async function main() {
     process.exit(0);
   }
 
-  console.log(`\n📋 校验 ${skillNames.length} 个 skill...\n`);
+  const targetLabel = target === "all" ? "全平台" : target;
+  console.log(
+    `\n📋 校验 ${skillNames.length} 个 skill（目标: ${targetLabel}）...\n`,
+  );
 
   const results: SkillResult[] = [];
 
@@ -68,7 +102,7 @@ async function main() {
       continue;
     }
 
-    const validation = await validateSkillDir(skillDir);
+    const validation = await validateSkillDir(skillDir, target);
     const testsPassed = validation.valid ? await runTests(skillDir) : null;
 
     results.push({

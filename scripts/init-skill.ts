@@ -50,7 +50,7 @@ function renderTemplate(
 }
 
 async function main() {
-  console.log("\n🔧 创建新的 Claude Code Skill\n");
+  console.log("\n🔧 创建新的 Skill（兼容 Claude Code / OpenClaw / Codex）\n");
 
   const rawName = await prompt("Skill 名称 (kebab-case)");
   if (!rawName) {
@@ -62,6 +62,13 @@ async function main() {
   const displayName = toDisplayName(name);
   const description = await prompt("描述 (一句话)");
   const author = await prompt("作者", "1COOS");
+  const platformInput = await prompt(
+    "目标平台 (claude/openclaw/codex/all)",
+    "all",
+  );
+  const platforms = platformInput === "all"
+    ? ["claude", "openclaw", "codex"]
+    : platformInput.split(",").map((s) => s.trim());
 
   const skillDir = join(SKILLS_DIR, name);
   const scriptsDir = join(skillDir, "scripts");
@@ -76,6 +83,17 @@ async function main() {
   await mkdir(scriptsDir, { recursive: true });
   await mkdir(join(skillDir, "references"), { recursive: true });
   await mkdir(join(skillDir, "assets"), { recursive: true });
+
+  // Codex: 创建 agents 目录并生成 openai.yaml
+  if (platforms.includes("codex")) {
+    const agentsDir = join(skillDir, "agents");
+    await mkdir(agentsDir, { recursive: true });
+    const openaiYaml = `interface:
+  display_name: "${displayName}"
+  short_description: "${description}"
+`;
+    await Bun.write(join(agentsDir, "openai.yaml"), openaiYaml);
+  }
 
   // 模板变量
   const vars = { name, displayName, description, author };
@@ -106,12 +124,17 @@ async function main() {
   console.log(`   目录: skills/${name}/`);
   console.log(`   SKILL.md: skills/${name}/SKILL.md`);
   console.log(`   脚本: skills/${name}/scripts/main.ts`);
+  console.log(`   平台: ${platforms.join(", ")}`);
+  if (platforms.includes("codex")) {
+    console.log(`   Codex: skills/${name}/agents/openai.yaml`);
+  }
   console.log(`\n后续步骤:`);
   console.log(`   1. 编辑 skills/${name}/SKILL.md 完善说明`);
   console.log(`   2. 编辑 skills/${name}/scripts/main.ts 实现逻辑`);
   console.log(`   3. 运行 bun install 链接工作区依赖`);
   console.log(`   4. 运行 cd skills/${name}/scripts && bun test 测试`);
   console.log(`   5. 运行 bun run validate -- ${name} 校验`);
+  console.log(`   6. 运行 bun run package -- ${name} --target all 打包`);
 }
 
 main();
