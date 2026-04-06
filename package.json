@@ -15,7 +15,8 @@
     "package": "bun run scripts/package-plugin.ts",
     "package:all": "bun run scripts/package-plugin.ts --all",
     "publish": "bun run scripts/publish.ts",
-    "publish:clawhub": "bun run scripts/publish-clawhub.ts"
+    "publish:clawhub": "bun run scripts/publish-clawhub.ts",
+    "link-skills": "bun run scripts/link-skills.ts"
   },
   "dependencies": {
     "@1coos/shared-utils": "workspace:*"

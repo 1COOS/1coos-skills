@@ -1,0 +1,14 @@
+{
+  "name": "1coos-quickie",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "test": "bun test"
+  },
+  "dependencies": {
+    "@1coos/shared-utils": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  }
+}

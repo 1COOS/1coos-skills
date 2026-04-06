@@ -1,0 +1,10 @@
+{
+  "outputDir": null,
+  "formatting": {
+    "maxWidth": 80,
+    "listMarker": "-"
+  },
+  "reader": {
+    "timeout": 120000
+  }
+}
