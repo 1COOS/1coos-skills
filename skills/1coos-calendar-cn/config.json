@@ -1,0 +1,15 @@
+{
+  "lang": "cn",
+  "modules": {
+    "ganZhi": true,
+    "yiJi": true,
+    "chongSha": true,
+    "jieQi": true,
+    "holiday": true,
+    "foto": true,
+    "tao": false,
+    "xiu": false,
+    "jiShen": false,
+    "positions": false
+  }
+}
