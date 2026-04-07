@@ -1,7 +1,7 @@
 ---
 name: 1coos-quickie
 description: Quickly save web content as formatted Markdown. TRIGGER when user pastes a URL and wants to save/clip it, read-later, or extract content from YouTube, Twitter/X, WeChat, Bilibili, Telegram, RSS, or any web page.
-version: 1.0.0
+version: 1.0.1
 metadata: {"openclaw":{"requires":{"bins":["bun","uvx"]},"install":[{"kind":"uv","package":"x-reader[all] @ git+https://github.com/runesleo/x-reader.git","bins":["x-reader"]}],"emoji":"📎"}}
 ---
 
@@ -50,14 +50,21 @@ Core parameters are configurable via `config.json` in the skill directory:
 
 CLI arguments always override config.json values.
 
+## Security Notice
+
+This skill runs third-party code at runtime:
+- **uvx** fetches and executes [x-reader](https://github.com/runesleo/x-reader) from GitHub on each invocation
+- x-reader makes network requests to the target URL and platform-specific APIs (FxTwitter, etc.)
+- Output is written only to the configured local directory
+
 ## Execution Instructions
 
 When the user invokes this skill:
 
-1. **Check prerequisites**: Verify `uvx` is available. If not, instruct the user to install uv: `curl -LsSf https://astral.sh/uv/install.sh | sh`
-2. **Run extraction**: Execute the script:
+1. **Check prerequisites**: Verify `uvx` is available by running `which uvx`. If missing, tell the user: "uvx is required but not found. Please install uv from https://docs.astral.sh/uv/getting-started/installation/ and try again." Do NOT run any install commands on behalf of the user.
+2. **Run extraction**: Execute the script using the skill's absolute path:
    ```bash
-   bun run ${CLAUDE_SKILL_DIR}/scripts/main.ts $ARGUMENTS
+   bun run /path/to/skills/1coos-quickie/scripts/main.ts <user-arguments>
    ```
 3. **Report results**: Show the output file path, the extracted title, and a brief content summary.
 4. **Handle errors**:

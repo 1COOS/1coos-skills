@@ -8,6 +8,7 @@ import type { SkillFrontmatter } from "./skill-validator";
 export interface PackageOptions {
   skillDir: string;
   outputDir: string;
+  minify?: boolean;
 }
 
 export interface PackageResult {
@@ -103,6 +104,7 @@ export async function packageSkillAsPlugin(
           outdir: destScriptsDir,
           target: "bun",
           format: "esm",
+          minify: options.minify ?? false,
         });
 
         if (!buildResult.success) {
@@ -151,6 +153,7 @@ export async function packageSkillAsPlugin(
 async function buildScriptsAndAssets(
   skillDir: string,
   destSkillDir: string,
+  minify = false,
 ): Promise<{ success: boolean; error?: string }> {
   // 复制 SKILL.md
   await cp(join(skillDir, "SKILL.md"), join(destSkillDir, "SKILL.md"));
@@ -176,6 +179,7 @@ async function buildScriptsAndAssets(
         outdir: destScriptsDir,
         target: "bun",
         format: "esm",
+        minify,
       });
 
       if (!buildResult.success) {
@@ -241,7 +245,7 @@ export async function packageForClawHub(
     }
     await mkdir(pluginDir, { recursive: true });
 
-    const buildResult = await buildScriptsAndAssets(skillDir, pluginDir);
+    const buildResult = await buildScriptsAndAssets(skillDir, pluginDir, options.minify);
     if (!buildResult.success) {
       return {
         success: false,
@@ -304,7 +308,7 @@ export async function packageForCodex(
     }
     await mkdir(pluginDir, { recursive: true });
 
-    const buildResult = await buildScriptsAndAssets(skillDir, pluginDir);
+    const buildResult = await buildScriptsAndAssets(skillDir, pluginDir, options.minify);
     if (!buildResult.success) {
       return {
         success: false,

@@ -26,6 +26,7 @@ const VALID_TARGETS: PackageTarget[] = ["claude", "openclaw", "codex", "all"];
 async function main() {
   const args = Bun.argv.slice(2);
   const packageAll = args.includes("--all");
+  const minify = args.includes("--minify");
 
   // 解析 --target 参数
   let target: PackageTarget = "all";
@@ -60,9 +61,9 @@ async function main() {
     toPackage = skillNames;
   } else {
     console.log(
-      "用法: bun run package -- <skill-name> [--target claude|openclaw|codex|all]",
+      "用法: bun run package -- <skill-name> [--target claude|openclaw|codex|all] [--minify]",
     );
-    console.log("      bun run package:all [--target claude|openclaw|codex|all]");
+    console.log("      bun run package:all [--target claude|openclaw|codex|all] [--minify]");
     process.exit(1);
   }
 
@@ -112,6 +113,7 @@ async function main() {
       const result = await packageSkillAsPlugin({
         skillDir,
         outputDir: PLUGINS_DIR,
+        minify,
       });
 
       if (!result.success) {
@@ -134,6 +136,7 @@ async function main() {
       const result = await packageForClawHub({
         skillDir,
         outputDir: clawHubDir,
+        minify,
       });
 
       if (!result.success) {
@@ -151,6 +154,7 @@ async function main() {
       const result = await packageForCodex({
         skillDir,
         outputDir: codexDir,
+        minify,
       });
 
       if (!result.success) {

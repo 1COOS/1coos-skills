@@ -5,6 +5,11 @@
   },
   "plugins": [
     {
+      "name": "1coos-calendar-cn-plugin",
+      "description": "查询中国传统日历/黄历信息。TRIGGER when user asks about Chinese calendar, lunar date, 农历, 黄历, 万年历, 节气, 五行， 宜忌, 干支，佛历，道历等。",
+      "source": "./plugins/1coos-calendar-cn-plugin"
+    },
+    {
       "name": "1coos-markdown-converter-plugin",
       "description": "Convert files to beautifully formatted Markdown. TRIGGER when user asks to convert a file to Markdown, extract text from PDF/DOCX/PPTX/XLSX, or format a document as Markdown.",
       "source": "./plugins/1coos-markdown-converter-plugin"
